@@ -33,19 +33,19 @@ llama-3.1-8b-instant         llama-3.1-8b-instant
 generates answer             generates Q&A pairs
     ↓                              ↓
 Availability check           Parse JSON pairs
-(info in document?)               ↓
+(info in document?)                ↓
     ↓                              ↓
     └──────────┬────────────────────┘
                ↓
        Ragas Evaluation
        qwen-2.5-32b (eval LLM)
        ┌─────────────┬──────────────────┐
-       Faithfulness   Answer Relevancy
-       LLM claim      LLM + MiniLM
-       check          embeddings
-               ↓
+       Faithfulness          Answer Relevancy
+       LLM claim             LLM + MiniLM
+       check                 embeddings
+                       ↓
        Scores: faithfulness · relevancy · combined
-               ↓
+                       ↓
        JSON response → Swagger UI
 ```
 
