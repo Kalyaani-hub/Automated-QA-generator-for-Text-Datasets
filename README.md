@@ -50,6 +50,87 @@ Availability check           Parse JSON pairs
 ```
 
 ---
+┌─────────────────────────────────────────────────────────────────┐
+│                        USER INTERFACE                            │
+│                   (Swagger UI - FastAPI)                         │
+│              http://127.0.0.1:8000/docs                          │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+        ┌────────────────┴────────────────┐
+        │                                 │
+    ┌───▼────────┐            ┌──────────▼────┐
+    │  /ask      │            │  /generate    │
+    │  Endpoint  │            │  Endpoint     │
+    └───┬────────┘            └──────────┬────┘
+        │                                │
+        │                                │
+    ┌───▼────────────────────────────────▼──────┐
+    │     DOCUMENT PROCESSING LAYER              │
+    │  - File Upload (PDF/TXT)                   │
+    │  - Text Extraction & Parsing               │
+    │  - Context Preparation                     │
+    └───┬─────────────────────────────────────┬──┘
+        │                                     │
+        │                                     │
+    ┌───▼──────────────────┐     ┌───────────▼────────────────┐
+    │  ANSWER GENERATION   │     │  Q&A PAIR GENERATION       │
+    │  ────────────────    │     │  ──────────────────        │
+    │  Model: Groq LLM     │     │  Model: Groq LLM           │
+    │  (llama-3.1-8b)      │     │  (llama-3.1-8b)            │
+    │                      │     │                            │
+    │  Input: Context +    │     │  Input: Context            │
+    │         Question     │     │  Output: Q&A Pairs         │
+    │  Output: Answer      │     │                            │
+    └───┬──────────────────┘     └────────────────┬───────────┘
+        │                                         │
+        └──────────────────┬──────────────────────┘
+                           │
+        ┌──────────────────▼──────────────────┐
+        │  EVALUATION LAYER (Ragas Framework) │
+        │  ────────────────────────────────── │
+        │                                     │
+        │  ┌─────────────────────────────┐   │
+        │  │ Faithfulness Metric         │   │
+        │  │ ─────────────────────────   │   │
+        │  │ Model: Groq LLM             │   │
+        │  │ (qwen/qwen3-32b)            │   │
+        │  │ Verifies answer grounding   │   │
+        │  │ in source context           │   │
+        │  └─────────────────────────────┘   │
+        │                                     │
+        │  ┌─────────────────────────────┐   │
+        │  │ Answer Relevancy Metric     │   │
+        │  │ ───────────────────────────│   │
+        │  │ Model: Groq LLM             │   │
+        │  │ (qwen/qwen3-32b)            │   │
+        │  │ Embeddings: HuggingFace     │   │
+        │  │ (all-MiniLM-L6-v2)          │   │
+        │  │ Measures contextual fit     │   │
+        │  └─────────────────────────────┘   │
+        │                                     │
+        └─────────────────┬────────────────────┘
+                          │
+        ┌─────────────────▼──────────────────┐
+        │  RESPONSE FORMATTING LAYER         │
+        │  ───────────────────────────────   │
+        │  - Score Aggregation               │
+        │  - Combined Score Calculation      │
+        │  - Summary Generation              │
+        │  - JSON Response Formatting        │
+        └─────────────────┬────────────────────┘
+                          │
+        ┌─────────────────▼──────────────────┐
+        │  JSON RESPONSE TO CLIENT           │
+        │  ────────────────────────────      │
+        │  {                                 │
+        │    "question": "...",              │
+        │    "answer": "...",                │
+        │    "faithfulness_score": 0.85,     │
+        │    "relevancy_score": 0.90,        │
+        │    "combined_score": 0.875,        │
+        │    "evaluation_summary": "..."     │
+        │  }                                 │
+        └────────────────────────────────────┘
 
 ## 🛠️ Tech Stack
 
